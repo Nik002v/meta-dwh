@@ -1,23 +1,23 @@
-# Meta DWH — lokalna demonstracija
+# Meta DWH — local demonstration
 
-Rešenje selekcionog zadatka: istorijska analitika korišćenja tabela i prijavljene potrošnje Trino upita. DuckDB čuva DWH, Python i SQL ga pune, a dva kumulativna paketa JSONL/CSV fajlova simuliraju izvore. Nisu potrebni Trino klaster, AWS nalog, SQLite ni poseban servis registra.
+An internship selection task solution for historical analysis of table usage and reported Trino query resource consumption. DuckDB stores the warehouse, Python and SQL populate it, and two cumulative packages of JSONL/CSV files simulate the sources. No Trino cluster, AWS account, SQLite database or separate registry service is required.
 
-**DuckDB baza `warehouse/meta_dwh.duckdb` generiše se lokalno i ne čuva se u Gitu.** Repozitorijum sadrži kod, oba paketa sintetičkih podataka i primere rezultata u `outputs/`. Dokumentacija dizajna i pretpostavki napisana je na engleskom da može poslužiti kao deo predaje zadatka.
+**The DuckDB database `warehouse/meta_dwh.duckdb` is generated locally and is not stored in Git.** The repository includes the code, both synthetic data packages and sample results in `outputs/`. The design and assumptions are documented in English as part of the task submission.
 
-[Key assumptions](docs/DESIGN.md#key-assumptions) izdvaja pretpostavke uvedene radi jednostavnije demonstracije, posebno istorijski registar i izvorna vremena ingestije/izmene. Njihovo postojanje u stvarnom sistemu nije potvrđeno.
+[Key assumptions](docs/DESIGN.md#key-assumptions) identifies the simplifying assumptions, especially the historical registry and source ingestion/modification timestamps. Their availability in the actual system has not been confirmed.
 
-[Design rationale](docs/DESIGN.md#design-rationale) kratko objašnjava zašto su izabrani ovaj model, granularnost, metrike i način punjenja.
+[Design rationale](docs/DESIGN.md#design-rationale) briefly explains the choices of model, grain, metrics and loading strategy.
 
-## Pokretanje
+## Getting started
 
-Python 3.10+; implementacija je proverena na Pythonu 3.12 i DuckDB-u 1.4.3. Iz ovog foldera, u PowerShell-u:
+Requires Python 3.10+; verified with Python 3.12 and DuckDB 1.4.3. From this directory, in PowerShell:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --disable-pip-version-check -r requirements.txt
 ```
 
-Posle kloniranja napravi i napuni bazu, proveri ponovno pokretanje i generiši izveštaje:
+After cloning, create and populate the database, check that reprocessing is safe, and generate the reports:
 
 ```powershell
 .\.venv\Scripts\python.exe pipeline.py init
@@ -26,43 +26,43 @@ Posle kloniranja napravi i napuni bazu, proveri ponovno pokretanje i generiši i
 .\.venv\Scripts\python.exe pipeline.py report
 ```
 
-Treće pokretanje vraća `already_processed` i ne menja redove. `init` odbija da prepiše postojeću bazu. Na Linuxu/macOS-u zameni `.\.venv\Scripts\python.exe` sa `.venv/bin/python`.
+The second `incremental` run returns `already_processed` and leaves the rows unchanged. `init` refuses to overwrite an existing database. On Linux/macOS, replace `.\.venv\Scripts\python.exe` with `.venv/bin/python`.
 
-Ako baza već postoji, možeš je koristiti sa `incremental` i `report`. Za novu demonstraciju dodaj novu putanju, na primer `--db warehouse/demo.duckdb`, svim komandama za punjenje i izveštaje.
+If the database already exists, use it with `incremental` and `report`. To start a fresh demonstration, add a new path, such as `--db warehouse/demo.duckdb`, to every load and report command.
 
-Pri ručnom otvaranju baze koristi `SET TimeZone = 'UTC';` za isti prikaz vremena kao u pipeline-u. DuckDB klijent inače može prikazati isti trenutak u lokalnoj vremenskoj zoni.
+When opening the database manually, use `SET TimeZone = 'UTC';` to display timestamps as the pipeline does. Otherwise, a DuckDB client may display the same instant in the local time zone.
 
-Paketi su već generisani. Možeš ih deterministički ponovo napraviti:
+The data packages are already included. To regenerate them deterministically and run the tests:
 
 ```powershell
 .\.venv\Scripts\python.exe generate_data.py
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-Regenerisanje vraća originalne sintetičke fajlove; ne menja bazu. Za novu demonstraciju zatim izaberi novi DB fajl.
+Regeneration restores the original synthetic files; it does not modify the database. Choose a new database file for a fresh demonstration afterward.
 
-## Gde je šta
+## Repository contents
 
-| Putanja | Sadržaj |
+| Path | Contents |
 |---|---|
-| [docs/DESIGN.md](docs/DESIGN.md) | Model, granularnost, veze, mere, pretpostavke i pravila punjenja |
-| [docs/SYNTHETIC_DATA.md](docs/SYNTHETIC_DATA.md) | Dva paketa, objašnjenje primera i očekivani rezultati |
-| [sql/schema.sql](sql/schema.sql) | Kreiranje dimenzija, fact-a, bridge-a i tehničkih tabela |
-| [pipeline.py](pipeline.py) | Normalizacija, obogaćivanje, init/incremental i transakcioni upis |
-| [sql/reports/](sql/reports/) | Izvršivi primeri upita; parametri su na početku prvih upita |
-| [generate_data.py](generate_data.py) | Generator oba paketa |
-| [data/init/](data/init/) i [data/incremental/](data/incremental/) | Simulirani izvori, uključujući spoljni registar |
-| [tests/test_pipeline.py](tests/test_pipeline.py) | Provere poslovnih rezultata, ponavljanja i prekida |
-| `warehouse/meta_dwh.duckdb` | Lokalno generisan DWH; nije verzionisan |
-| `outputs/*.csv` | Rezultati pet SQL izveštaja |
-| [outputs/validation.txt](outputs/validation.txt) | Rezultat završnog pokretanja testova |
+| [docs/DESIGN.md](docs/DESIGN.md) | Model, grain, relationships, measures, assumptions and loading rules |
+| [docs/SYNTHETIC_DATA.md](docs/SYNTHETIC_DATA.md) | The two packages, example scenarios and expected results |
+| [sql/schema.sql](sql/schema.sql) | Definitions of dimensions, fact, bridge and operational tables |
+| [pipeline.py](pipeline.py) | Normalization, enrichment, initial/incremental loads and transactional writes |
+| [sql/reports/](sql/reports/) | Executable example queries; report parameters are defined at the top of the relevant queries |
+| [generate_data.py](generate_data.py) | Generator for both packages |
+| [data/init/](data/init/) and [data/incremental/](data/incremental/) | Simulated sources, including the external registry |
+| [tests/test_pipeline.py](tests/test_pipeline.py) | Checks for business results, reprocessing and interrupted loads |
+| `warehouse/meta_dwh.duckdb` | Locally generated DWH; not versioned |
+| `outputs/*.csv` | Results of the five SQL reports |
+| [outputs/validation.txt](outputs/validation.txt) | Results of the final validation run |
 
-## Očekivani rezultat posle oba paketa
+## Expected results after both packages
 
-- 14 izvršavanja, 19 bridge veza, 5 naloga, 3 tima, 4 tabele i 9 SQL tekstova.
-- Ukupno 175001 ms poznatog CPU vremena i 11000 prijavljenih ulaznih bajtova. Dva izvršavanja imaju nepoznat CPU i ulazne bajtove.
-- Za `feature_events`: 4 različita naloga sa INPUT vezom, uključujući neuspešna izvršavanja i ZERO/UNKNOWN čitanje.
-- Tim `T_PLATFORM`: 7 upita, uključujući 1 neuspešan, 90 CPU sekundi i 5900 ulaznih bajtova.
-- `etl_issue`: 3 konfliktna zapisa, 2 odbijena zapisa i 2 neispravne metrike. Prihvaćeni `q001` ostaje sa 60000 ms CPU-a i oznakom konflikta.
+- 14 executions, 19 bridge links, 5 accounts, 3 teams, 4 tables and 9 SQL texts.
+- A total of 175001 ms of known CPU time and 11000 reported input bytes. Two executions have unknown CPU and input bytes.
+- For `feature_events`: 4 distinct accounts with an INPUT link, including failed executions and ZERO/UNKNOWN read evidence.
+- Team `T_PLATFORM`: 7 queries, including 1 failed query, 90 CPU seconds and 5900 input bytes.
+- `etl_issue`: 3 conflict records, 2 rejected records and 2 invalid metrics. The accepted `q001` retains its 60000 ms CPU value and is flagged as having a conflict.
 
-Poređenje rezultata radi se nad prijavljenim poznatim metrikama; `NULL` nije nula. Ne postoji `Unknown` tim: kompletnost i ispravnost registra su dokumentovana pretpostavka.
+Results reflect known reported metrics; `NULL` does not mean zero. There is no `Unknown` team: registry completeness and correctness are documented assumptions.
