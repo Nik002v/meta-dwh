@@ -1,0 +1,2 @@
+accepted_executions,failed_executions,reported_cpu_ms,reported_input_bytes,unknown_cpu_queries,unknown_input_queries,queries_with_invalid_metrics,queries_with_source_conflict,rejected_records,conflicting_records,invalid_metric_issues
+14,2,175001.0,11000,2,2,1,1,2,3,2

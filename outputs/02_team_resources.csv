@@ -1,0 +1,2 @@
+team_id,team_name,query_count,failed_queries,cpu_seconds,physical_input_bytes,logical_writer_input_bytes,spilled_bytes,max_single_query_peak_user_memory_bytes,avg_wall_time_ms,p95_wall_time_ms
+T_PLATFORM,Platform,7,1,90.0,5900,15000,0,1048576,1000.0,1000.0

@@ -1,0 +1,15 @@
+calendar_date,team_id,team_name,query_count,cpu_seconds,physical_input_bytes
+2026-01-10,T_ANALYTICS,Product Analytics,1,60.0,3000
+2026-01-11,T_PLATFORM,Platform,1,20.0,1200
+2026-01-15,T_ANALYTICS,Product Analytics,1,11.0,1100
+2026-01-18,T_ANALYTICS,Product Analytics,1,5.0,100
+2026-01-20,T_PLATFORM,Platform,1,15.0,2000
+2026-01-21,T_ANALYTICS,Product Analytics,1,0.001,0
+2026-01-22,T_PLATFORM,Platform,1,8.0,500
+2026-01-23,T_ANALYTICS,Product Analytics,1,,
+2026-01-31,T_PLATFORM,Platform,1,7.0,0
+2026-02-05,T_PLATFORM,Platform,1,30.0,1500
+2026-02-07,T_PLATFORM,Platform,1,4.0,500
+2026-02-08,T_PLATFORM,Platform,1,6.0,200
+2026-02-09,T_RESEARCH,Research,1,9.0,900
+2026-02-10,T_ANALYTICS,Product Analytics,1,,

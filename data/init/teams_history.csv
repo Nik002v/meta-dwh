@@ -1,0 +1,3 @@
+team_id,team_name,is_active,valid_from,valid_to,updated_at
+T_ANALYTICS,Analytics,true,2026-01-01T00:00:00Z,,2026-01-01T00:00:00Z
+T_PLATFORM,Platform,true,2026-01-01T00:00:00Z,,2026-01-01T00:00:00Z

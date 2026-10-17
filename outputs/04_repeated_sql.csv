@@ -1,0 +1,10 @@
+sql_hash,sql_text,executions,cpu_seconds,avg_wall_time_ms
+d819cbe42938f06da76ee6ebd37e2ea41adda2d1ae0a7f51a2fb06e7166ace25,SELECT count(*) FROM iceberg.product_analytics.feature_events e JOIN iceberg.product_analytics.users u ON e.user_id = u.id,3,110.0,4000.0
+d673ada3ed84f41cccf6eff2b2ba222d4ce4978bf14ab2c28afad5e945b13ce1,SELECT count(*) FROM iceberg.product_analytics.feature_events,3,16.0,1000.0
+5d1152c637cec7875eddedddce7d77935c17b88c564b643708eb390776d39659,INSERT INTO iceberg.product_analytics.daily_usage SELECT * FROM iceberg.product_analytics.feature_events,2,19.0,1000.0
+176937e869b357d77a63225a75cad9c1f8ca94cc6ffb47879f66acde17030fad,SELECT * FROM iceberg.billing.invoices,1,9.0,1000.0
+12461b62d437c28a12578c5f641d98eccdfcd969cc9d5ae4da7b2164e27087b7,SELECT count(*) FROM iceberg.product_analytics.feature_events a JOIN iceberg.product_analytics.feature_events b ON a.user_id=b.user_id,1,8.0,1000.0
+3c0f9fe978d2899531784ff78a865afa03aa5615402d04b5b18bd50f117f80e0,SELECT * FROM iceberg.product_analytics.feature_events WHERE event_date = DATE '1900-01-01',1,7.0,1000.0
+ba641a2dbd0be23804e390ab0c26afa33d0f320dbe63a773544a89ac68383c00,UPDATE iceberg.product_analytics.daily_usage SET count = count + 1,1,6.0,1000.0
+e004ebd5b5532a4b85984a62f8ad48a81aa3460c1ca07701f386135d72cdecf5,SELECT 1,1,0.001,1000.0
+b7e82df43f0150096e5099176d0351e833a15518641a58cdc10e0cc1e4e2a4f7,SELECT sum(value) FROM iceberg.product_analytics.feature_events,1,,1000.0

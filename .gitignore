@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.wal
+warehouse/*.duckdb
+outputs/*
+!outputs/01_distinct_users.csv
+!outputs/02_team_resources.csv
+!outputs/03_daily_team_history.csv
+!outputs/04_repeated_sql.csv
+!outputs/05_data_quality.csv
+!outputs/load_summary.json
+!outputs/validation.txt

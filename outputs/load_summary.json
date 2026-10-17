@@ -1,0 +1,27 @@
+[
+  {
+    "package_id": "init",
+    "status": "loaded",
+    "profiles_inserted": 6,
+    "raw_selected": 9,
+    "created_ignored": 1,
+    "facts_inserted": 7,
+    "duplicates_skipped": 1
+  },
+  {
+    "package_id": "incremental",
+    "status": "loaded",
+    "profiles_updated": 2,
+    "profiles_inserted": 2,
+    "raw_selected": 13,
+    "issues_logged": 7,
+    "records_rejected": 2,
+    "conflicting_records": 3,
+    "duplicates_skipped": 1,
+    "facts_inserted": 7
+  },
+  {
+    "package_id": "incremental",
+    "status": "already_processed"
+  }
+]

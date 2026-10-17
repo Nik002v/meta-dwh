@@ -1,0 +1,7 @@
+user_id,trino_username,display_name,account_type,is_active,valid_from,valid_to,updated_at
+U_ANA,ana,Ana Petrovic,HUMAN,true,2026-01-01T00:00:00Z,2026-02-02T00:00:00Z,2026-02-02T00:00:00Z
+U_BORIS,boris,Boris Ilic,HUMAN,true,2026-01-01T00:00:00Z,,2026-01-01T00:00:00Z
+U_ETL,svc_etl,ETL service,SERVICE,true,2026-01-01T00:00:00Z,,2026-01-01T00:00:00Z
+U_REPORT,svc_report,Reporting service,SERVICE,true,2026-01-01T00:00:00Z,,2026-01-01T00:00:00Z
+U_ANA,ana,Ana Jovanovic,HUMAN,true,2026-02-02T00:00:00Z,,2026-02-02T00:00:00Z
+U_MILA,mila,Mila Jovic,HUMAN,true,2026-02-01T00:00:00Z,,2026-02-01T00:00:00Z
