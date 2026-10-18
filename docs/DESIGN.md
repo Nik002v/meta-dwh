@@ -1,5 +1,7 @@
 # Meta DWH: design and assumptions
 
+For a short introduction, see the [quick overview](QUICK_OVERVIEW.md). Running instructions are in the [README](../README.md).
+
 ## Scope
 
 This implementation answers the selection task using a local, persistent DuckDB warehouse and synthetic source exports. It does not require access to JetBrains infrastructure. Production inputs are described as Trino events stored in Iceberg tables on S3; local JSONL files stand in for an export of those events. They are not themselves Iceberg tables. CSV files simulate an external identity/team registry. SQL creates and queries the warehouse; Python performs the transformations and executes parameterized SQL writes.
@@ -121,13 +123,15 @@ Dimensions, facts, bridges, issue records, successful-load audit and both checkp
 | Same execution, differing relevant content | Log conflict; never choose by latest ingestion or largest CPU |
 | Existing accepted execution receives a conflict | Keep accepted measures and set `has_source_conflict` |
 | First observed batch contains conflicting copies | Insert no fact; keep identity blocked by the issue ledger until explicit resolution |
-| Missing query ID, malformed lifecycle/unsupported state | Reject record, retain original and reason |
+| Unreadable JSON, missing query ID, malformed lifecycle/unsupported state | Reject record; retain offending line or parsed envelope and reason |
 | Invalid negative/nonfinite/unparseable/out-of-range metric | Keep valid execution data; replace only bad metric with NULL; log issue and flag fact |
 | Missing optional metric | NULL; not automatically a data error |
 
-The event-content SHA-256 is separate from the SQL hash. It uses a canonical JSON projection of modeled source fields, relevant session defaults and I/O counters, excluding ingestion metadata, JSON key order, input-list order and unused diagnostics. Repeated input occurrences remain significant. It does not equate differently formatted duration strings. The synthetic serializer is stable. Accept/reject/conflict decisions therefore do not depend on changing dimension labels or derived team assignments.
+JSON integer counters must be nonnegative signed-64-bit integers, and durations must include units. Decimal and exponent number tokens are preserved as text during event parsing (`parse_float=str`), so a value such as `1e309` cannot become infinity and abort event hashing or issue logging. Such counter values fail metric validation, become NULL and are logged without rejecting the otherwise valid execution. Non-standard JSON literals such as `NaN` and `Infinity` are rejected as unreadable JSON.
 
-Raw exports are retained. Issues retain complete offending raw lines/envelopes. Accepted facts keep raw record ID, ingestion time and event-content hash. Issue IDs prevent duplicate issue rows. There is no automatic conflict-resolution UI; corrected source observations require an explicit resolution policy. Replay the two packages in sequence to reproduce acceptance history; initializing directly from the final conflicted snapshot is not equivalent to replaying that history.
+The event-content SHA-256 is separate from the SQL hash. It uses a canonical JSON projection of parsed modeled source fields, relevant session defaults and I/O counters, excluding ingestion metadata, JSON key order, input-list order and unused diagnostics. Decimal/exponent tokens are represented as strings in this projection. Repeated input occurrences remain significant. It does not equate differently formatted duration strings. The synthetic serializer is stable. Accept/reject/conflict decisions therefore do not depend on changing dimension labels or derived team assignments.
+
+Raw exports are retained. Issues retain unreadable source lines or complete parsed offending envelopes, with decimal/exponent tokens represented as strings. The source export retains the original JSON representation. Accepted facts keep raw record ID, ingestion time and event-content hash. Issue IDs prevent duplicate issue rows. There is no automatic conflict-resolution UI; corrected source observations require an explicit resolution policy. Replay the two packages in sequence to reproduce acceptance history; initializing directly from the final conflicted snapshot is not equivalent to replaying that history.
 
 Names identify tables only within the assumed catalog namespace. Table renames and drop/recreate under the same full name are excluded. Supporting them would require stable object identifiers and historical name mappings from catalog/audit metadata; Iceberg's table UUID is one potential identifier. A dimension row is not deleted because a table disappears from later usage events. The dimension represents observed usage, not a complete cluster inventory.
 
@@ -143,7 +147,7 @@ Run `pipeline.py report` or execute the files in `sql/reports/` against the data
 4. `04_repeated_sql.sql`: frequency and resource usage by exact SQL text.
 5. `05_data_quality.sql`: accepted totals, unknown metrics, conflicts and rejections.
 
-The test suite verifies fixed business totals, historical attribution after transfers and late arrivals, repeated SQL versus duplicates, multi-table/self-join grain, read evidence, conflicting payload retention, persistent blocking of conflicted identities, idempotence including audit times, registry corrections, and rollback after an injected interruption.
+The test suite verifies fixed business totals, historical attribution after transfers and late arrivals, repeated SQL versus duplicates, multi-table/self-join grain, read evidence, numeric overflow handling and issue retention, conflicting payload retention, persistent blocking of conflicted identities, idempotence including audit times, registry corrections, and rollback after an injected interruption.
 
 ## Primary references
 

@@ -105,6 +105,28 @@ class PipelineTests(unittest.TestCase):
             JOIN bridge_query_table USING(query_key) WHERE query_id IN ('q007','q102') ORDER BY query_id'''),
             [('q007', 'UNKNOWN'), ('q102', 'ZERO')])
 
+    def test_overflowing_numeric_metrics_do_not_abort_batch(self):
+        self.incremental()
+        package = self.later_package()
+        record = json.loads((package / 'events.jsonl').read_text().splitlines()[1])
+        record.update(raw_record_id='r-overflow', raw_ingested_at='2026-03-01T01:00:00Z')
+        record['event']['metadata']['queryId'] = 'q-overflow'
+        record['event']['statistics']['physicalInputBytes'] = 'OVERFLOW_TOKEN'
+        record['event']['ioMetadata']['inputs'] = [{
+            'catalogName': 'iceberg', 'schema': 'product_analytics',
+            'table': 'feature_events', 'physicalInputBytes': 'OVERFLOW_TOKEN'}]
+        with (package / 'events.jsonl').open('a', encoding='utf-8') as handle:
+            handle.write(json.dumps(record).replace('"OVERFLOW_TOKEN"', '1e309') + '\n')
+        result = pipeline.load('incremental', package, self.db)
+        self.assertEqual(result['facts_inserted'], 1)
+        self.assertEqual(self.rows('''SELECT cpu_time_ms, physical_input_bytes, has_invalid_metrics,
+            read_evidence FROM fact_query_execution JOIN bridge_query_table USING(query_key)
+            WHERE query_id='q-overflow' '''), [(60000.0, None, True, 'UNKNOWN')])
+        issues = self.rows("SELECT issue_type, raw_payload FROM etl_issue WHERE query_id='q-overflow'")
+        self.assertEqual(len(issues), 2)
+        self.assertTrue(all(kind == 'INVALID_METRIC' and '1e309' in payload for kind, payload in issues))
+        self.assertEqual(pipeline.load('incremental', package, self.db)['status'], 'already_processed')
+
     def test_conflicts_rejections_and_blocked_identity(self):
         self.incremental()
         self.assertEqual(self.rows("SELECT cpu_time_ms, has_source_conflict FROM fact_query_execution WHERE query_id='q001'"), [(60000, True)])

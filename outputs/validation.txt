@@ -3,6 +3,7 @@ Python 3.12.7, DuckDB 1.4.3
 test_conflicts_rejections_and_blocked_identity (test_pipeline.PipelineTests.test_conflicts_rejections_and_blocked_identity) ... ok
 test_initial_grain_and_multi_table_query (test_pipeline.PipelineTests.test_initial_grain_and_multi_table_query) ... ok
 test_missing_and_invalid_metrics_read_evidence (test_pipeline.PipelineTests.test_missing_and_invalid_metrics_read_evidence) ... ok
+test_overflowing_numeric_metrics_do_not_abort_batch (test_pipeline.PipelineTests.test_overflowing_numeric_metrics_do_not_abort_batch) ... ok
 test_registry_correction_reassigns_facts_without_rewriting_bridge (test_pipeline.PipelineTests.test_registry_correction_reassigns_facts_without_rewriting_bridge) ... ok
 test_replay_preserves_all_rows_and_later_duplicate_preserves_audit (test_pipeline.PipelineTests.test_replay_preserves_all_rows_and_later_duplicate_preserves_audit) ... ok
 test_reports_and_resource_totals (test_pipeline.PipelineTests.test_reports_and_resource_totals) ... ok
@@ -10,14 +11,16 @@ test_transaction_rolls_back_dimensions_issues_and_checkpoint (test_pipeline.Pipe
 test_type1_history_late_event_and_cutoff_boundary (test_pipeline.PipelineTests.test_type1_history_late_event_and_cutoff_boundary) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 22.672s
+Ran 9 tests in 29.031s
 
 OK
 
 Consistency audit:
 PASS: all 10 source files match deterministic regeneration.
 PASS: init, incremental and replay agree with load_summary.json.
-PASS: existing database matches a fresh load in table counts and all five reports; no orphan bridge rows.
-PASS: distinct-account report has one count; resource reports contain no removed diagnostic columns.
-PASS: all five CSV exports refreshed and match current SQL results.
-PASS: local documentation links and section anchors resolve.
+PASS: all five committed CSV exports match fresh results from current SQL.
+PASS: documented model counts match; no orphan bridge rows.
+PASS: existing local database matches a fresh load in all table counts and five reports.
+PASS: distinct-account semantics and resource-report columns remain unchanged.
+PASS: 24 local documentation links and anchors resolve; Markdown code fences are balanced.
+PASS: quick overview is linked from README and detailed design; overflow behavior and test-only fixtures are documented.

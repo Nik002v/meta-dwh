@@ -4,6 +4,8 @@ An internship selection task solution for historical analysis of table usage and
 
 **The DuckDB database `warehouse/meta_dwh.duckdb` is generated locally and is not stored in Git.** The repository includes the code, both synthetic data packages and sample results in `outputs/`. The design and assumptions are documented in English as part of the task submission.
 
+**Start here: [Quick overview](docs/QUICK_OVERVIEW.md)** — the model, design choices, resource metrics, assumptions, required metadata and update process in one short document.
+
 [Key assumptions](docs/DESIGN.md#key-assumptions) identifies the simplifying assumptions, especially the historical registry and source ingestion/modification timestamps. Their availability in the actual system has not been confirmed.
 
 [Design rationale](docs/DESIGN.md#design-rationale) briefly explains the choices of model, grain, metrics and loading strategy.
@@ -45,6 +47,7 @@ Regeneration restores the original synthetic files; it does not modify the datab
 
 | Path | Contents |
 |---|---|
+| [docs/QUICK_OVERVIEW.md](docs/QUICK_OVERVIEW.md) | Short overview of the model, metrics, assumptions and update process |
 | [docs/DESIGN.md](docs/DESIGN.md) | Model, grain, relationships, measures, assumptions and loading rules |
 | [docs/SYNTHETIC_DATA.md](docs/SYNTHETIC_DATA.md) | The two packages, example scenarios and expected results |
 | [sql/schema.sql](sql/schema.sql) | Definitions of dimensions, fact, bridge and operational tables |

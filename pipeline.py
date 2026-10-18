@@ -309,7 +309,10 @@ def process_events(con, registry, package, previous, cutoff, now, batch, counts)
             if not line.strip():
                 continue
             try:
-                record = json.loads(line, parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
+                # Counters must be integers; durations must include units.
+                # Keep decimal/exponent tokens as text so overflow cannot create inf.
+                record = json.loads(line, parse_float=str,
+                                    parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
             except ValueError:
                 record = {'unreadable_line': line.rstrip('\n')}
                 issue(con, record, 'REJECTED', 'Unreadable JSON record', batch, now, counts)
